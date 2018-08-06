@@ -51,17 +51,34 @@ namespace mp
             if(node.Name == "property")
             {
                 var aName = node.Attributes["name"];
-                if(aName != null && aName.Value == "is")
+                if(aName != null)
                 {
-                    if(node.InnerText != null)
+                    if(aName.Value == "is" || aName.Value == "script")
                     {
-                        var s = node.InnerText;
-                        //node.InnerText = null;
-                        s = s.Replace("\r\n", @"\n");
-                        s = s.Replace("\n", @"\n");
-                        var isnode = GetNodeInSlibing_is(d, node);
-                        isnode.SetAttribute("value", s);
+                        var code = "";
+                        if(!string.IsNullOrEmpty(node.InnerText))
+                        {
+                            code = node.InnerText;
+                        }
+                        else 
+                        {
+                            var aValue = node.Attributes["value"];
+                            if(aValue != null)
+                            {
+                                code = aValue.Value;
+                            }
+                        }
+
+                        if(!string.IsNullOrEmpty(code))
+                        {
+                            //node.InnerText = null;
+                            code = code.Replace("\r\n", @"\n");
+                            code = code.Replace("\n", @"\n");
+                            var isnode = GetNodeInSlibing_is(d, node);
+                            isnode.SetAttribute("value", code);
+                        }
                     }
+
                 }
             }
 
@@ -79,14 +96,14 @@ namespace mp
             foreach(var c in p)
             {
                 var cc = c as XmlElement;
-                if(cc.GetAttribute("name") == "_is")
+                if(cc.GetAttribute("name") == "_script")
                 {
                     return cc;
                 }
             }
             XmlElement node = d.CreateElement("property");
             p.AppendChild(node);
-            node.SetAttribute("name", "_is");
+            node.SetAttribute("name", "_script");
             return node;
         }
     }
